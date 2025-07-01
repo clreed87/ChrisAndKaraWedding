@@ -1,0 +1,63 @@
+# Ignore everything in the root except wp-content
+/*
+!.gitignore
+!wp-content/
+
+# Ignore everything in wp-content except plugins and themes
+wp-content/*
+!wp-content/plugins/
+!wp-content/themes/
+!wp-content/mu-plugins/
+
+# Ignore all plugins except your custom plugin(s)
+wp-content/plugins/*
+!wp-content/plugins/crt-plugin/
+
+# Ignore all themes except your custom theme(s)
+wp-content/themes/*
+!wp-content/themes/infinity-pro/
+
+# Ignore all mu-plugins except your custom mu-plugins (if any)
+wp-content/mu-plugins/*
+# !wp-content/mu-plugins/crt-plugin/
+
+# Ignore uploads, cache, upgrade, and other volatile dirs
+wp-content/uploads/
+wp-content/cache/
+wp-content/upgrade/
+wp-content/backups/
+wp-content/advanced-cache.php
+wp-content/object-cache.php
+wp-content/debug.log
+
+# Common system files
+.DS_Store
+Thumbs.db
+
+# Composer dependencies (if present)
+vendor/
+composer.lock
+
+# Node dependencies (if present)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# SFTP/FTP deployment files
+*.sublime-project
+*.sublime-workspace
+.idea/
+.vscode/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# OS junk files
+ehthumbs.db
+Icon?
+Desktop.ini
