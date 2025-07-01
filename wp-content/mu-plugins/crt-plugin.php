@@ -142,5 +142,50 @@ function crt_feed_permalink( $content ) {
 	return $content;
 }
 
+//* Convert markdown to HTML and restore markdown on post open
+// Only run in the admin and frontend (skip if called by CLI, etc.)
+if (!defined('ABSPATH')) exit;
+
+// 1. Include Parsedown
+require_once __DIR__ . '/parsedown.php';
+
+// 2. Convert Markdown to HTML on save, and store original Markdown in meta
+add_filter('wp_insert_post_data', function($data, $postarr) {
+    // Post types to use (add or remove as needed)
+    $allowed_types = ['post', 'page', 'portfolio'];
+    if (!in_array($data['post_type'], $allowed_types)) return $data;
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return $data;
+    if (isset($postarr['action']) && $postarr['action'] === 'inline-save') return $data;
+    if (empty($data['post_content'])) return $data;
+
+    // Only convert if not already HTML (basic: has a closing HTML tag)
+    if (preg_match('/<\/[a-z][\s\S]*>/', $data['post_content'])) return $data;
+
+    // Save the markdown for later on save_post (using a closure for $data scope)
+    add_action('save_post', function($post_id) use ($data) {
+        // Save the original markdown to meta
+        update_post_meta($post_id, '_crt_markdown', $data['post_content']);
+    });
+
+    // Convert Markdown to HTML
+    $Parsedown = new Parsedown();
+    // $Parsedown->setSafeMode(true); // Optional for added security
+    $data['post_content'] = $Parsedown->text($data['post_content']);
+
+    return $data;
+}, 9, 2);
+
+// 3. When opening a post in the editor, replace content with stored Markdown (if any)
+add_filter('the_post', function($post) {
+    // Only on admin post edit screens (not frontend, not quick/bulk edit)
+    if (is_admin() && isset($_GET['action']) && $_GET['action'] === 'edit') {
+        $markdown = get_post_meta($post->ID, '_crt_markdown', true);
+        if (!empty($markdown)) {
+            $post->post_content = $markdown;
+        }
+    }
+    return $post;
+});
+
 /* Stop Adding Functions Below this Line */
 ?>
