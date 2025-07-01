@@ -19,7 +19,7 @@ wp-content/themes/*
 
 # Ignore all mu-plugins except your custom mu-plugins (if any)
 wp-content/mu-plugins/*
-# !wp-content/mu-plugins/crt-plugin/
+!wp-content/mu-plugins/crt-plugin/
 
 # Ignore uploads, cache, upgrade, and other volatile dirs
 wp-content/uploads/
