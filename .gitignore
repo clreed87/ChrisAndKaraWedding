@@ -11,7 +11,7 @@ wp-content/*
 
 # Ignore all plugins except your custom plugin(s)
 wp-content/plugins/*
-!wp-content/plugins/crt-plugin/
+!wp-content/mu-plugins/crt-plugin.php
 
 # Ignore all themes except your custom theme(s)
 wp-content/themes/*
@@ -19,7 +19,8 @@ wp-content/themes/*
 
 # Ignore all mu-plugins except your custom mu-plugins (if any)
 wp-content/mu-plugins/*
-!wp-content/mu-plugins/crt-plugin/
+!wp-content/mu-plugins/crt-plugin.php
+!wp-content/mu-plugins/parsedown.php
 
 # Ignore uploads, cache, upgrade, and other volatile dirs
 wp-content/uploads/
