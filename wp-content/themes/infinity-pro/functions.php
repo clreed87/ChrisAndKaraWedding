@@ -287,4 +287,19 @@ function infinity_register_sidebar() {
 		'name'        => __( 'Offscreen Content', 'infinity-pro' ),
 		'description' => __( 'This is the offscreen content section.', 'infinity-pro' ),
 	) );
+	
+/**
+ * Custom functions.
+ *
+ * 
+ *
+ *
+ */
+
+// Remove Genesis SEO Settings meta box from posts and pages
+remove_action('admin_menu', 'genesis_add_inpost_seo_box');
+
+// Remove Genesis Scripts meta box from posts and pages
+remove_action('admin_menu', 'genesis_add_inpost_scripts_box');
+
 }
