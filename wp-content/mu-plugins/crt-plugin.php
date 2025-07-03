@@ -117,8 +117,8 @@ add_filter('the_content_feed', function($content) {
 require_once __DIR__ . '/parsedown.php';
 
 /**
- * Convert Markdown to HTML on save, and store original Markdown in post meta.
- * Applies to 'post' and 'page' post types.
+ * Convert Markdown (even mixed with HTML) to HTML on save, and
+ * store the original Markdown in post meta for 'post' and 'page'.
  */
 add_filter('wp_insert_post_data', function($data, $postarr) {
     $allowed_types = ['post', 'page'];
@@ -126,11 +126,9 @@ add_filter('wp_insert_post_data', function($data, $postarr) {
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return $data;
     if (isset($postarr['action']) && $postarr['action'] === 'inline-save') return $data;
     if (empty($data['post_content'])) return $data;
-    // Only convert if not already HTML (basic: has a closing HTML tag)
-    if (preg_match('/<\/[a-z][\s\S]*>/', $data['post_content'])) return $data;
 
-    // Save Markdown to post meta after save
-    add_action('save_post', 'crt_save_markdown_meta', 10, 1);
+    // Store original markdown in a global for use in save_post
+    $GLOBALS['_crt_latest_markdown'] = $data['post_content'];
 
     // Convert Markdown to HTML for public content
     $Parsedown = new Parsedown();
@@ -139,19 +137,16 @@ add_filter('wp_insert_post_data', function($data, $postarr) {
 }, 9, 2);
 
 /**
- * Save the original Markdown from the editor to post meta.
+ * Save the original Markdown from the most recent edit to post meta.
  */
-function crt_save_markdown_meta($post_id) {
-    $post = get_post($post_id);
-    if (!$post) return;
+add_action('save_post', function($post_id, $post, $update) {
     $allowed_types = ['post', 'page'];
     if (!in_array($post->post_type, $allowed_types)) return;
-    $original_markdown = isset($_POST['content']) ? $_POST['content'] : '';
-    if ($original_markdown) {
-        update_post_meta($post_id, '_crt_markdown', $original_markdown);
+    if (!empty($GLOBALS['_crt_latest_markdown'])) {
+        update_post_meta($post_id, '_crt_markdown', $GLOBALS['_crt_latest_markdown']);
+        unset($GLOBALS['_crt_latest_markdown']);
     }
-    remove_action('save_post', 'crt_save_markdown_meta', 10); // prevent recursion
-}
+}, 10, 3);
 
 /**
  * Restore Markdown to the editor for admin editing (if present).
