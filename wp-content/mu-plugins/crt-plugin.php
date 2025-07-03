@@ -125,9 +125,8 @@ add_filter('wp_insert_post_data', function($data, $postarr) {
     if (!in_array($data['post_type'], $allowed_types)) return $data;
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return $data;
     if (isset($postarr['action']) && $postarr['action'] === 'inline-save') return $data;
-    if (empty($data['post_content'])) return $data;
 
-    // Store original markdown in a global for use in save_post
+    // Always store the current markdown, even if blank, for the save_post action
     $GLOBALS['_crt_latest_markdown'] = $data['post_content'];
 
     // Convert Markdown to HTML for public content
@@ -137,13 +136,20 @@ add_filter('wp_insert_post_data', function($data, $postarr) {
 }, 9, 2);
 
 /**
- * Save the original Markdown from the most recent edit to post meta.
+ * Save or delete the original Markdown from the most recent edit to post meta.
  */
 add_action('save_post', function($post_id, $post, $update) {
     $allowed_types = ['post', 'page'];
     if (!in_array($post->post_type, $allowed_types)) return;
-    if (!empty($GLOBALS['_crt_latest_markdown'])) {
-        update_post_meta($post_id, '_crt_markdown', $GLOBALS['_crt_latest_markdown']);
+
+    // Always check the global, even if empty
+    if (array_key_exists('_crt_latest_markdown', $GLOBALS)) {
+        $markdown = $GLOBALS['_crt_latest_markdown'];
+        if (strlen(trim($markdown)) > 0) {
+            update_post_meta($post_id, '_crt_markdown', $markdown);
+        } else {
+            delete_post_meta($post_id, '_crt_markdown');
+        }
         unset($GLOBALS['_crt_latest_markdown']);
     }
 }, 10, 3);
