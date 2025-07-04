@@ -119,12 +119,20 @@ require_once __DIR__ . '/parsedown.php';
 /**
  * Convert Markdown (even mixed with HTML) to HTML on save, and
  * store the original Markdown in post meta for 'post' and 'page'.
+ * If the content contains Gutenberg blocks, skip Markdown processing.
  */
 add_filter('wp_insert_post_data', function($data, $postarr) {
     $allowed_types = ['post', 'page'];
     if (!in_array($data['post_type'], $allowed_types)) return $data;
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return $data;
     if (isset($postarr['action']) && $postarr['action'] === 'inline-save') return $data;
+
+    // Skip Markdown processing if the content contains Gutenberg blocks
+    if (function_exists('has_blocks') && has_blocks($data['post_content'])) {
+        // Also clear any stale markdown meta, since we're now using blocks
+        $GLOBALS['_crt_latest_markdown'] = '';
+        return $data;
+    }
 
     // Always store the current markdown, even if blank, for the save_post action
     $GLOBALS['_crt_latest_markdown'] = $data['post_content'];
@@ -155,10 +163,15 @@ add_action('save_post', function($post_id, $post, $update) {
 }, 10, 3);
 
 /**
- * Restore Markdown to the editor for admin editing (if present).
+ * Restore Markdown to the editor for admin editing (if present),
+ * but only if the post does not contain blocks.
  */
 add_filter('the_post', function($post) {
+    // Only restore Markdown if no blocks in the content
     if (is_admin() && isset($_GET['action']) && $_GET['action'] === 'edit') {
+        if (function_exists('has_blocks') && has_blocks($post->post_content)) {
+            return $post;
+        }
         $markdown = get_post_meta($post->ID, '_crt_markdown', true);
         if (!empty($markdown)) {
             $post->post_content = $markdown;
