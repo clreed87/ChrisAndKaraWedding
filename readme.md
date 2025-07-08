@@ -50,6 +50,23 @@ ChrisAndKaraWedding/
 
 ## 🔧 Local Development with Docker
 
+> 💡 **Tip:** If you prefer a consistent and shorter network name (like `wordpressnet`), add this to the `docker-compose.yml` file under `networks:`:
+
+```yaml
+networks:
+  wordpressnet:
+    name: wordpressnet  # Add this line
+    driver: bridge
+```
+
+Then run:
+```sh
+docker compose down
+docker compose up -d
+```
+
+This will ensure your one-off commands can always use `--network=wordpressnet` regardless of the folder name.
+
 This project is designed to run via Docker Compose. You must clone the full Docker setup from the parent `WordPressDocker/` directory.
 
 ### Setup Instructions
