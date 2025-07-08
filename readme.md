@@ -134,12 +134,34 @@ You can run WP-CLI commands without installing WP-CLI locally.
 
 **List all plugins:**
 ```sh
-docker run --rm -v $(pwd):/var/www/html -w /var/www/html --network=host wordpress:cli wp plugin list
+source ../WordPressDocker/.env
+
+docker run --rm \
+  --network=wordpressdocker_wordpressnet \
+  -v $(pwd):/var/www/html \
+  -w /var/www/html \
+  -e WORDPRESS_DB_HOST=mariadb \
+  -e WORDPRESS_DB_NAME=ChrisAndKaraWedding \
+  -e WORDPRESS_DB_USER=$MYSQL_USER \
+  -e WORDPRESS_DB_PASSWORD=$MYSQL_PASSWORD \
+  wordpress:cli \
+  wp plugin list
 ```
 
 **Search-replace URLs (local → production):**
 ```sh
-docker run --rm -v $(pwd):/var/www/html -w /var/www/html --network=host wordpress:cli wp search-replace 'https://chrisandkarawedding.local' 'https://www.chrisandkara.wedding' --skip-columns=guid --allow-root
+source ../WordPressDocker/.env
+
+docker run --rm \
+  --network=wordpressdocker_wordpressnet \
+  -v $(pwd):/var/www/html \
+  -w /var/www/html \
+  -e WORDPRESS_DB_HOST=mariadb \
+  -e WORDPRESS_DB_NAME=ChrisAndKaraWedding \
+  -e WORDPRESS_DB_USER=$MYSQL_USER \
+  -e WORDPRESS_DB_PASSWORD=$MYSQL_PASSWORD \
+  wordpress:cli \
+  wp search-replace 'https://chrisandkarawedding.local' 'https://www.chrisandkara.wedding' --skip-columns=guid --allow-root
 ```
 
 > ⚠️ Always back up your DB before running search-replace commands.
