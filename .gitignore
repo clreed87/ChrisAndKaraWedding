@@ -1,9 +1,11 @@
-# Ignore everything in the root except wp-content
+# Ignore everything in the root except wp-content, .gitignore, composer.json, and README.md
 /*
 !.gitignore
+!composer.json
+!README.md
 !wp-content/
 
-# Ignore everything in wp-content except plugins and themes
+# Ignore everything in wp-content except plugins, themes, and mu-plugins
 wp-content/*
 !wp-content/plugins/
 !wp-content/themes/
