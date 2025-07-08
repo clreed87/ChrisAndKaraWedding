@@ -1,0 +1,28 @@
+{
+  "name": "chrisandkarawedding/wordpress-plugins",
+  "description": "Composer-managed WordPress plugins for local development.",
+  "type": "project",
+  "require": {
+    "wpackagist-plugin/akismet": "*",
+    "wpackagist-plugin/jetpack-boost": "*",
+    "wpackagist-plugin/secure-custom-fields": "*",
+    "wpackagist-plugin/wp-sweep": "*"
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://wpackagist.org"
+    }
+  ],
+  "extra": {
+    "installer-paths": {
+      "wp-content/plugins/{$name}/": ["type:wordpress-plugin"],
+      "wp-content/themes/{$name}/": ["type:wordpress-theme"]
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "composer/installers": true
+    }
+  }
+}
